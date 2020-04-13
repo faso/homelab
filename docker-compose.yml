@@ -1,0 +1,105 @@
+version: "3.3"
+services:
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    volumes:
+      - portainer_data:/data portainer/portainer
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports: 
+      - "8000:8000"
+      - "42002:9000"
+    restart: always
+
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - GUID=1000
+      - TZ=Europe/Riga
+    volumes:
+      - ~/faso/docker-volumes/heimdall:/config
+    ports:
+      - "42001:80"
+      - "44301:443"
+    restart: always
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    volumes:
+      - ./docker-volumes/jellyfin/config:/config
+      - ./docker-volumes/jellyfin/cache:/cache
+      - ./docker-volumes/jellyfin/media:/media
+    ports:
+      - 42003:8096
+      - 44303:8920 #optional
+    restart: unless-stopped
+
+  piwigo:
+    image: linuxserver/piwigo
+    container_name: piwigo
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Riga
+    volumes:
+      - ./docker-volumes/piwigo:/config
+    ports:
+      - 42004:80
+    networks:
+      - piwigo
+    restart: always
+  
+  huginn:
+    image: huginn/huginn
+    deploy:
+      restart_policy:
+        condition: any
+    ports:
+      - "3000:3000"
+
+  mariadb:
+    image: linuxserver/mariadb
+    container_name: mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=REPLACE
+      - TZ=Europe/Riga
+      - MYSQL_DATABASE=REPLACE #optional
+      - MYSQL_USER=REPLACE #optional
+      - MYSQL_PASSWORD=REPLACE #optional
+    volumes:
+      - ./docker-volumes/mariadb:/config
+    ports:
+      - 42005:3306
+    networks:
+      - piwigo
+    restart: always
+
+  ubooquity:
+    image: linuxserver/ubooquity
+    container_name: ubooquity
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Riga
+      - MAXMEM=2048
+    volumes:
+      - ./docker-volumes/ubooquity/config:/config
+      - ./docker-volumes/ubooquity/books:/books
+      - ./docker-volumes/ubooquity/comics:/comics
+      - ./docker-volumes/ubooquity/files:/files
+    ports:
+      - 42007:2202
+      - 42008:2203
+    restart: always
+
+volumes:
+  portainer_data:
+
+networks:
+  piwigo:
+    driver: bridge
