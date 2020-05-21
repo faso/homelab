@@ -34,7 +34,7 @@ services:
       - ./docker-volumes/jellyfin/media:/media
     ports:
       - 42003:8096
-      - 44303:8920 #optional
+      - 44303:8920
     restart: unless-stopped
 
   piwigo:
