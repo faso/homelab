@@ -96,6 +96,17 @@ services:
       - 42007:2202
       - 42008:2203
     restart: always
+    
+  services:
+    quakejs:
+      container_name: quakejs
+      environment:
+          - SERVER=192.168.2.10
+          - HTTP_PORT=42066
+      ports:
+          - '42066:80'
+          - '27960:27960'
+      image: 'treyyoder/quakejs:latest'
 
 volumes:
   portainer_data:
