@@ -1,0 +1,1 @@
+[...document.getElementsByClassName('vocab-row')].map(e => `${e.children[0].textContent},${e.children[2].textContent}`).join('\n')
